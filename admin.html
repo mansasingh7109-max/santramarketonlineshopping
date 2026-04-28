@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SANTRA MALL - ADMIN PANEL</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .login-container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); width: 90%; max-width: 400px; }
+        .login-container h2 { text-align: center; color: #7c3aed; margin-bottom: 20px; }
+        .login-container input { width: 100%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; }
+        .login-container button { width: 100%; padding: 12px; margin-top: 10px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+        #loginBtn { background: #7c3aed; color: white; }
+        #googleLoginBtn { background: #ea4335; color: white; }
+        #forgotBtn { display: block; text-align: center; margin-top: 15px; color: #7c3aed; text-decoration: none; }
+        #adminDashboard { display: none; width: 100%; min-height: 100vh; background: #f5f5f5; padding: 20px; }
+        .hide { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <!-- LOGIN SCREEN - SIRF 1 BAAR HAI AB -->
+    <div id="loginScreen" class="login-container">
+        <h2>🔑 Key Panel</h2>
+        <input type="email" id="adminEmail" placeholder="Admin Email" value="manishatak07@gmail.com">
+        <input type="password" id="adminPassword" placeholder="Enter Password">
+        <button id="loginBtn">Login</button>
+        <button id="googleLoginBtn">🚀 Sign in with Google</button>
+        <a href="#" id="forgotBtn">Forgot Password?</a>
+    </div>
+
+    <!-- ADMIN DASHBOARD - LOGIN KE BAAD YE KHULEGA -->
+    <div id="adminDashboard">
+        <h1>🎉 Welcome Admin - Santra Mall Dashboard</h1>
+        <p>Email: <span id="adminUserEmail"></span></p>
+        <button id="logoutBtn" style="padding:10px 20px; background:red; color:white; border:none; border-radius:5px; margin-top:20px;">Logout</button>
+        
+        <!-- YAHAN TERE PURANE FEATURES DAAL DE -->
+        <div style="margin-top:30px;">
+            <h3>Old Features Yahan Aayenge</h3>
+            <p>Tu apne purane dashboard ka HTML yahan paste kar sakti hai</p>
+        </div>
+    </div>
+
+    <!-- FIREBASE SCRIPT - SABSE IMPORTANT -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // FIREBASE CONFIG - ISME APNI REAL KEYS DAALNA
+        const firebaseConfig = {
+            const firebaseConfig = {
+  apiKey: "AIzaSyApXIGoX071cYEvGbfhBF69DB9Kv5YlSMA",
+  authDomain: "santramarketshoppingmall.firebaseapp.com",
+  projectId: "santramarketshoppingmall",
+  storageBucket: "santramarketshoppingmall.firebasestorage.app",
+  messagingSenderId: "398490252924",
+  appId: "1:398490252924:web:d1b6348b549183b93b7bf9",
+  measurementId: "G-ZW1ZR8HETY"
+};
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+        const ADMIN_EMAIL = "manishatak07@gmail.com";
+
+        // ELEMENTS PAKDO
+        const loginScreen = document.getElementById('loginScreen');
+        const adminDashboard = document.getElementById('adminDashboard');
+        const adminUserEmail = document.getElementById('adminUserEmail');
+
+        // AGAR PEHLE SE LOGIN HAI TO DIRECT DASHBOARD DIKHAO
+        onAuthStateChanged(auth, (user) => {
+            if (user && user.email === ADMIN_EMAIL) {
+                loginScreen.classList.add('hide');
+                adminDashboard.style.display = 'block';
+                adminUserEmail.textContent = user.email;
+            } else {
+                loginScreen.classList.remove('hide');
+                adminDashboard.style.display = 'none';
+            }
+        });
+
+        // EMAIL PASSWORD LOGIN
+        document.getElementById("loginBtn").onclick = () => {
+            const email = document.getElementById("adminEmail").value;
+            const password = document.getElementById("adminPassword").value;
+            
+            if(!email || !password) return alert("Email aur Password dono daalo");
+            if(email !== ADMIN_EMAIL) return alert("❌ Sirf admin login kar sakta hai");
+
+            signInWithEmailAndPassword(auth, email, password)
+            .then(() => {
+                // Dashboard onAuthStateChanged se khul jayega
+            })
+            .catch((error) => alert("❌ Galat Password: " + error.message));
+        };
+
+        // GOOGLE LOGIN
+        document.getElementById("googleLoginBtn").onclick = () => {
+            signInWithPopup(auth, provider)
+            .then((result) => {
+                if(result.user.email !== ADMIN_EMAIL){
+                    signOut(auth);
+                    alert("❌ Sirf admin login kar sakta hai");
+                }
+            }).catch((error) => alert("❌ Google Error: " + error.message));
+        };
+
+        // FORGOT PASSWORD
+        document.getElementById("forgotBtn").onclick = (e) => {
+            e.preventDefault();
+            sendPasswordResetEmail(auth, ADMIN_EMAIL)
+            .then(() => alert("✅ Password reset link bhej diya manishatak07@gmail.com pe"))
+            .catch((error) => alert("Error: " + error.message));
+        };
+
+        // LOGOUT
+        document.getElementById("logoutBtn").onclick = () => {
+            signOut(auth);
+        };
+    </script>
+
+</body>
+</html>
